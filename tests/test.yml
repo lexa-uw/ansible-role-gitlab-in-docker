@@ -1,0 +1,18 @@
+---
+
+- name: Check running docker container
+  hosts: localhost
+  vars:
+    gitlab_container_check_url: false
+    gitlab_config: false
+    volumes: []
+    gitlab_container:
+      ports:
+        - "80:80"
+  tasks:
+    - name: Run on the scratch
+      include_role:
+        name: app
+    - name: Run on the configured
+      include_role:
+        name: app

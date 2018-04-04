@@ -1,0 +1,46 @@
+---
+# tasks file for role-gitlab
+- name: Prepare directory for shared folders
+  file:
+    path: "{{gitlab_dir}}"
+    state: directory
+  when:
+    - gitlab_dir
+
+- name: Run GitLab
+  register: gitlab
+  docker_container:
+    image: "{{gitlab_container.image}}"
+    links: "{{gitlab_container.links}}"
+    name: "{{gitlab_container.name}}"
+    ports: "{{gitlab_container.ports}}"
+    pull: yes
+    restart: "{{gitlab_container.restart}}"
+    state: started
+    volumes: "{{gitlab_container.volumes}}"
+
+- name: Wait until GitLab started
+  delay: "{{gitlab_container_check_delay}}"
+  ignore_errors: yes
+  register: result
+  retries: "{{gitlab_container_check_retries}}"
+  until: result.status == 200
+  uri:
+    follow_redirects: safe
+    status_code: 200
+    url: "{{gitlab_container_check_url}}"
+  when:
+    - gitlab.changed
+    - gitlab_container_check_url
+
+- name: Setup GitLab config
+  become: yes
+  copy:
+    content: "{{gitlab_config}}"
+    dest: "{{gitlab_dir}}/etc/gitlab/gitlab.rb"
+  notify:
+    - Reload GitLab
+  when:
+    - gitlab_config
+
+- meta: flush_handlers

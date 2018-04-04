@@ -1,0 +1,8 @@
+---
+# handlers file for role-gitlab
+- name: Reload GitLab
+  register: result
+  delay: 5
+  retries: 10
+  until: '"gitlab Reconfigured!" in result.stdout'
+  command: 'docker exec "{{gitlab_container.name}}" gitlab-ctl reconfigure'

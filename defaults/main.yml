@@ -1,0 +1,20 @@
+---
+# defaults file for role-gitlab
+gitlab_dir: "/tmp/gitlab"
+gitlab_container_check_url: "http://localhost:80"
+gitlab_container_check_retries: 60
+gitlab_container_check_delay: 5
+gitlab_container:
+  image: "gitlab/gitlab-ce:10.6.2-ce.0"
+  name: "gitlab"
+  restart: false
+  links: []
+  ports:
+    - "80:80"
+  volumes:
+    - "{{gitlab_dir}}/etc/gitlab:/etc/gitlab"              # configs
+    - "{{gitlab_dir}}/var/opt/gitlab:/var/opt/gitlab"      # data
+    - "{{gitlab_dir}}/var/log/gitlab:/var/log/gitlab"      # logs
+
+gitlab_config: |
+  external_url 'http://localhost'
