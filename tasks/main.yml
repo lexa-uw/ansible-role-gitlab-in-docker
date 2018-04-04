@@ -5,7 +5,7 @@
     path: "{{gitlab_dir}}"
     state: directory
   when:
-    - gitlab_dir
+    - gitlab_dir != false
 
 - name: Run GitLab
   register: gitlab
@@ -31,16 +31,16 @@
     url: "{{gitlab_container_check_url}}"
   when:
     - gitlab.changed
-    - gitlab_container_check_url
+    - gitlab_container_check_url != false
 
 - name: Setup GitLab config
   become: yes
   copy:
     content: "{{gitlab_config}}"
-    dest: "{{gitlab_dir}}/etc/gitlab/gitlab.rb"
+    dest: "{{gitlab_config_dest}}"
   notify:
     - Reload GitLab
   when:
-    - gitlab_config
+    - gitlab_config != false
 
 - meta: flush_handlers
