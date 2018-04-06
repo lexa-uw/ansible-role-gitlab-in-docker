@@ -6,10 +6,11 @@ gitlab_container_check_retries: 60
 gitlab_container_check_delay: 5
 gitlab_container:
   image: "gitlab/gitlab-ce:10.6.2-ce.0"
-  name: "gitlab"
-  restart: false
-  recreate: false
   links: []
+  name: "gitlab"
+  recreate: false
+  restart: false
+  restart_policy: "on-failure"
   ports:
     - "80:80"
   volumes:

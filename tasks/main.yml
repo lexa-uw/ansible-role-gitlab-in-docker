@@ -15,8 +15,9 @@
     name: "{{gitlab_container.name}}"
     ports: "{{gitlab_container.ports}}"
     pull: yes
-    restart: "{{gitlab_container.restart}}"
     recreate: "{{gitlab_container.recreate}}"
+    restart: "{{gitlab_container.restart}}"
+    restart_policy: "{{gitlab_container.restart_policy}}"
     state: started
     volumes: "{{gitlab_container.volumes}}"
 
