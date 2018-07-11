@@ -22,8 +22,8 @@
     restart_policy: "{{gitlab_container_options_restart_policy}}"
     state: started
     volumes: "{{gitlab_container_options_volumes}} + [
-      '{{gitlab_container_options_name}}_config:/etc/gitlab'
-      '{{gitlab_container_options_name}}_data:/var/opt/gitlab'
+      '{{gitlab_container_options_name}}_config:/etc/gitlab',
+      '{{gitlab_container_options_name}}_data:/var/opt/gitlab',
       '{{gitlab_container_options_name}}_logs:/var/log/gitlab'
     ]"
 
