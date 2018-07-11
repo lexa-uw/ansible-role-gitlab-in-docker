@@ -1,23 +1,8 @@
 Run tests
 =========
 
-## Install dependencies
+1. Set name of directory with role to `app`
+2. Run tests
 ```bash
-ansible-galaxy install -r ./tests/requirements.yml --roles-path ./tests/roles/
-```
-
-## Run tests
-```bash
-ANSIBLE_CONFIG=./tests/ansible.cfg ansible-playbook tests/test.yml
-```
-
-## Run with ansible in docker(docker-in-docker)
-### Install dependencies
-```bash
-./tests/ops/bin/ansible ansible-galaxy install -r ./tests/requirements.yml --roles-path ./tests/roles/
-```
-
-### Run tests
-```bash
-./tests/ops/bin/ansible  ansible-playbook tests/test.yml
+ANSIBLE_ROLES_PATH=./../ ansible-playbook ./tests/test.yml -i ./tests/inventory
 ```

@@ -1,8 +1,15 @@
 ---
 # handlers file for role-gitlab
-- name: Reload GitLab
-  register: result
-  delay: 5
-  retries: 10
-  until: '"gitlab Reconfigured!" in result.stdout'
-  command: 'docker exec "{{gitlab_container.name}}" gitlab-ctl reconfigure'
+- name: GitLab reconfigure
+  command: 'docker exec "{{gitlab_container_options_name}}" gitlab-ctl reconfigure'
+  delay: "{{gitlab_container_check_delay}}"
+  register: gitlab_reconfigure_state
+  retries: "{{gitlab_container_check_retries}}"
+  until: '"gitlab Reconfigured!" in gitlab_reconfigure_state.stdout'
+
+- name: GitLab restart the services
+  command: 'docker exec "{{gitlab_container_options_name}}" gitlab-ctl restart'
+  delay: "{{gitlab_container_check_delay}}"
+  register: gitlab_restart_state
+  retries: "{{gitlab_container_check_retries}}"
+  until: '"ok: run: unicorn" in gitlab_restart_state.stdout'

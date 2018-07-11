@@ -1,47 +1,51 @@
 ---
 # tasks file for role-gitlab
-- name: Prepare directory for shared folders
-  file:
-    path: "{{gitlab_dir}}"
-    state: directory
-  when:
-    - gitlab_dir != false
+- name: Create GitLab volumes
+  register: gitlab_volumes
+  docker_volume:
+    name: "{{item}}"
+  with_items:
+    - "{{gitlab_container_options_name}}_config"
+    - "{{gitlab_container_options_name}}_data"
+    - "{{gitlab_container_options_name}}_logs"
 
 - name: Run GitLab
-  register: gitlab
+  register: gitlab_start_state
   docker_container:
-    image: "{{gitlab_container.image}}"
-    links: "{{gitlab_container.links}}"
-    name: "{{gitlab_container.name}}"
-    ports: "{{gitlab_container.ports}}"
-    pull: yes
-    recreate: "{{gitlab_container.recreate}}"
-    restart: "{{gitlab_container.restart}}"
-    restart_policy: "{{gitlab_container.restart_policy}}"
+    image: "{{gitlab_container_options_image}}"
+    links: "{{gitlab_container_options_links}}"
+    name: "{{gitlab_container_options_name}}"
+    ports: "{{gitlab_container_options_ports}}"
+    pull: "{{gitlab_container_options_pull}}"
+    recreate: "{{gitlab_container_options_recreate}}"
+    restart: "{{gitlab_container_options_restart}}"
+    restart_policy: "{{gitlab_container_options_restart_policy}}"
     state: started
-    volumes: "{{gitlab_container.volumes}}"
+    volumes: "{{gitlab_container_options_volumes}} + [
+      '{{gitlab_container_options_name}}_config:/etc/gitlab',
+      '{{gitlab_container_options_name}}_data:/var/opt/gitlab',
+      '{{gitlab_container_options_name}}_logs:/var/log/gitlab'
+    ]"
 
 - name: Wait until GitLab started
   delay: "{{gitlab_container_check_delay}}"
   ignore_errors: yes
-  register: result
+  register: gitlab_waiter_state
   retries: "{{gitlab_container_check_retries}}"
-  until: result.status == 200
-  uri:
-    follow_redirects: safe
-    status_code: 200
-    url: "{{gitlab_container_check_url}}"
+  until: gitlab_waiter_state.ansible_facts.docker_container.State.Health.Status == 'healthy'
+  docker_container:
+    name: "{{gitlab_container_options_name}}"
   when:
-    - gitlab.changed
-    - gitlab_container_check_url != false
+    - gitlab_start_state.changed
 
 - name: Setup GitLab config
   become: yes
   copy:
     content: "{{gitlab_config}}"
-    dest: "{{gitlab_config_dest}}"
+    dest: "{{gitlab_volumes.results[0].ansible_facts.docker_volume.Mountpoint}}/gitlab.rb"
   notify:
-    - Reload GitLab
+    - GitLab reconfigure
+    - GitLab restart the services
   when:
     - gitlab_config != false
 
