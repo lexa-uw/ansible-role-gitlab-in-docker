@@ -8,5 +8,5 @@ ansible-galaxy install -r ./tests/requirements.yml --roles-path ./tests/roles/
 
 ## Run tests
 ```bash
-ANSIBLE_CONFIG=./tests/ansible.cfg ansible-playbook tests/test.yml
+ANSIBLE_ROLES_PATH=./../ ansible-playbook ./tests/test.yml -i ./tests/inventory
 ```
