@@ -6,8 +6,8 @@ gitlab_container_check_retries: 60
 gitlab_container_options_image: "gitlab/gitlab-ce:11.0.3-ce.0"
 gitlab_container_options_links: []
 gitlab_container_options_name: "gitlab"
-gitlab_container_options_pull: "yes"
 gitlab_container_options_ports: ["80:80"]
+gitlab_container_options_pull: "yes"
 gitlab_container_options_recreate: false
 gitlab_container_options_restart: false
 gitlab_container_options_restart_policy: "on-failure"
